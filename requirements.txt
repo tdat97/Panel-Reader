@@ -1,0 +1,8 @@
+opencv-python
+numpy
+tensorflow
+
+spinnaker_python-2.6.0.157-cp38-cp38-win_amd64.whl
+simple-pyspin
+
+jupyterlab

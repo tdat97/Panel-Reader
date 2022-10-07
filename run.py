@@ -52,9 +52,9 @@ def main(test_mode=False):
         time.sleep(LOOP_PERIOD)
         
         file_name = get_time_str() + ".jpg"
-        
         img = cam_manager.get_image()
         poly_dict = poly_detector(img)
+        
         if poly_dict is None:
             logger.info("no detect")
             path = os.path.join(RECODE_PATH, "no_detect", file_name)
@@ -63,6 +63,7 @@ def main(test_mode=False):
             if cv2.waitKey(1) & 0xff == ord('q'): break
             continue
         
+        # with poly_dict, Getting crop_img, pred_str
         value_dict = {}
         for label in ["target_tmp", "actual_tmp"]:
             poly = poly_dict[label]
@@ -70,7 +71,6 @@ def main(test_mode=False):
             crop_img = cv2.resize(crop_img, (0,0), fx=1.3, fy=1)
             pred_str = ocr_engine(crop_img)
             value_dict[label] = pred_str.strip()
-        
         logger.info(f"value_dict : {value_dict}")
         
         # recode image
