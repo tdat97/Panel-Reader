@@ -43,6 +43,8 @@ def main(test_mode=False):
         
         image = cam_manager.get_image()
         poly_dict = poly_detector(img)
+        if poly_dict is None: continue
+        
         value_dict = {}
         for label in ["target_tmp", "actual_tmp"]:
             poly = poly_dict[label]
