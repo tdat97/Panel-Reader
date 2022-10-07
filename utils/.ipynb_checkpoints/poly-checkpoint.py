@@ -73,7 +73,7 @@ class SinglePolyDetector():
         
         # src_polys -> dst_polys
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RHO, 5.0)
-        dst_polys = cv2.perspectiveTransform(self.src_polys, M)
         if mask.sum() / mask.size < 0.3: return None
+        dst_polys = cv2.perspectiveTransform(self.src_polys, M)
         
         return dict(zip(self.labels, dst_polys))

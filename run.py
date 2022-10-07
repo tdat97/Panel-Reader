@@ -41,9 +41,12 @@ def main(test_mode=False):
     while True:
         time.sleep(LOOP_PERIOD)
         
-        image = cam_manager.get_image()
+        img = cam_manager.get_image()
         poly_dict = poly_detector(img)
-        if poly_dict is None: continue
+        if poly_dict is None:
+            cv2.imshow("test_show", img)
+            if cv2.waitKey(1) & 0xff == ord('q'): break
+            continue
         
         value_dict = {}
         for label in ["target_tmp", "actual_tmp"]:
@@ -53,18 +56,14 @@ def main(test_mode=False):
             pred_str = ocr_engine(crop_img)
             value_dict[label] = pred_str.strip()
         
-        if not value_dict["target_tmp"].isdigit(): continue
-        if not value_dict["actual_tmp"].isdigit(): continue
-        value_dict["target_tmp"] = int(value_dict["target_tmp"])
-        value_dict["actual_tmp"] = int(value_dict["actual_tmp"])
-        
         if test_mode:
-            image = draw_anno(image, poly_dict, value_dict)
-            cv2.imshow("test_show", image)
+            img = draw_anno(img, poly_dict, value_dict)
+            cv2.imshow("test_show", img)
             if cv2.waitKey(1) & 0xff == ord('q'): break
-            
-        # else:
-        #     trainsmit_db(value_dict)
+        else:
+            if not value_dict["target_tmp"].isdigit(): value_dict["target_tmp"] = ''
+            if not value_dict["actual_tmp"].isdigit(): value_dict["actual_tmp"] = ''
+            trainsmit_db(value_dict)
             
     cv2.destroyAllWindows()
         

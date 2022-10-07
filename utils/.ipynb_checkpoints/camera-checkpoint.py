@@ -22,6 +22,6 @@ class CameraManager():
         
     def get_image(self):
         self.cam.start()
-        image = cam.get_array()
+        image = self.cam.get_array()
         self.cam.stop()
         return image
