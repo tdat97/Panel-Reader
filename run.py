@@ -1,9 +1,9 @@
-# from camera import Camera
-from poly import SinglePolyDetector, get_crop_img_and_M
-from ocr import OcrEngine
-# from transmit import TransmitDB
+# from utils.camera import Camera
+from utils.poly import SinglePolyDetector, get_crop_img_and_M
+from utils.ocr import OcrEngine
+# from utils.transmit import TransmitDB
 
-from logger import logger
+from utils.logger import logger
 import time
 
 # loop period (sec)
@@ -33,7 +33,7 @@ def main():
 # test        
 import cv2
 def test():
-    path = "./temp/panel.png"
+    path = "./temp/panel_rotate.png"
     img = cv2.imread(path)
     poly_dict = poly_detector(img)
     
