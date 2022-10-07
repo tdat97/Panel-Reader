@@ -64,7 +64,7 @@ class SinglePolyDetector():
         
         # match
         kp, desc = self.detector.detectAndCompute(img_gray, None)
-        if not kp: return None
+        if len(kp) < 10: return None
         matches = self.matcher.match(self.desc, desc)
         
         # get keypoints of matches
