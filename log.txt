@@ -1,9 +1,0 @@
-2022-10-07 09:01:38,345 - root - DEBUG - poly_detector loaded.
-2022-10-07 09:01:38,361 - h5py._conv - DEBUG - Creating converter from 3 to 5
-2022-10-07 09:01:41,154 - root - DEBUG - ocr_engine loaded.
-2022-10-07 10:24:45,109 - root - DEBUG - poly_detector loaded.
-2022-10-07 10:24:45,116 - h5py._conv - DEBUG - Creating converter from 3 to 5
-2022-10-07 10:24:47,905 - root - DEBUG - ocr_engine loaded.
-2022-10-07 10:25:15,228 - root - DEBUG - poly_detector loaded.
-2022-10-07 10:25:15,232 - h5py._conv - DEBUG - Creating converter from 3 to 5
-2022-10-07 10:25:18,094 - root - DEBUG - ocr_engine loaded.
