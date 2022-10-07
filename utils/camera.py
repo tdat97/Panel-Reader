@@ -1,7 +1,7 @@
 from simple_pyspin import Camera
 import time
 
-ExposureTime = 1000
+ExposureTime = 10000
 DeviceLinkThroughputLimit = 100 * 1024 * 1024
 AcquisitionMode = "SingleFrame"
 
