@@ -44,7 +44,7 @@ def main(test_mode=False):
         img = cam_manager.get_image()
         poly_dict = poly_detector(img)
         if poly_dict is None:
-            cv2.imshow("test_show", img)
+            cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.5, fy=0.5))
             if cv2.waitKey(1) & 0xff == ord('q'): break
             continue
         
@@ -58,7 +58,7 @@ def main(test_mode=False):
         
         if test_mode:
             img = draw_anno(img, poly_dict, value_dict)
-            cv2.imshow("test_show", img)
+            cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.5, fy=0.5))
             if cv2.waitKey(1) & 0xff == ord('q'): break
         else:
             if not value_dict["target_tmp"].isdigit(): value_dict["target_tmp"] = ''
