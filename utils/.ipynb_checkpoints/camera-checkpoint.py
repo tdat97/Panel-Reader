@@ -1,19 +1,20 @@
 from simple_pyspin import Camera
 import time
+import cv2
 
-ExposureTime = 1000
+ExposureAuto = 'Off'
+ExposureTime = 10000
 DeviceLinkThroughputLimit = 100 * 1024 * 1024
 AcquisitionMode = "SingleFrame"
 
 class CameraManager():
-    def __init__(self, cam_number=0, exposure_time=ExposureTime, \
-                 device_link_throughput_limit=DeviceLinkThroughputLimit, \
-                 acquisition_mode=AcquisitionMode):
+    def __init__(self, cam_number=0):
         self.cam = Camera(cam_number)
         self.cam.init()
-        self.cam.ExposureTime = exposure_time
-        self.cam.DeviceLinkThroughputLimit = device_link_throughput_limit
-        self.cam.AcquisitionMode = acquisition_mode
+        self.cam.ExposureAuto = ExposureAuto
+        self.cam.ExposureTime = ExposureTime
+        self.cam.DeviceLinkThroughputLimit = DeviceLinkThroughputLimit
+        self.cam.AcquisitionMode = AcquisitionMode
         
         # warm up
         for _ in range(3):
@@ -22,6 +23,7 @@ class CameraManager():
         
     def get_image(self):
         self.cam.start()
-        image = cam.get_array()
+        image = self.cam.get_array()
         self.cam.stop()
+        image = cv2.cvtColor(image, cv2.COLOR_BayerBG2BGR)
         return image
