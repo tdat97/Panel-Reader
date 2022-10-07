@@ -64,7 +64,7 @@ class SinglePolyDetector():
         
         # match
         kp, desc = self.detector.detectAndCompute(img_gray, None)
-        if len(kp) < 10: return None
+        if len(kp) < 50: return None
         matches = self.matcher.match(self.desc, desc)
         
         # get keypoints of matches
@@ -73,7 +73,7 @@ class SinglePolyDetector():
         
         # src_polys -> dst_polys
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RHO, 5.0)
-        if mask.sum() / mask.size < 0.3: return None
+        if mask.sum() / mask.size < 0.15: return None
         dst_polys = cv2.perspectiveTransform(self.src_polys, M)
         
         return dict(zip(self.labels, dst_polys))

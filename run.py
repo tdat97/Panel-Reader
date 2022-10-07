@@ -7,9 +7,18 @@ from utils.tools import *
 
 import time
 import argparse
+import os
 
 # loop period (sec)
 LOOP_PERIOD = 1
+
+# Recode
+RECODE_PATH = "./recode"
+if not os.path.isdir(RECODE_PATH): os.mkdir(RECODE_PATH)
+path = os.path.join(RECODE_PATH, "detect")
+if not os.path.isdir(path): os.mkdir(path)
+path = os.path.join(RECODE_PATH, "no_detect")
+if not os.path.isdir(path): os.mkdir(path)
 
 # Poly
 SOURCE_IMG_PATH = "./source/panel2.png"
@@ -18,7 +27,6 @@ TARGET_LABEL = "panel"
 
 # OCR
 OCR_MODEL_PATH = "./source/OCR_aug3_300k.h5"
-# OCR_MODEL_PATH = "./source/ocr_rgb.h5"
 
 # DB
 # DB_ADDR = ""
@@ -36,14 +44,21 @@ logger.debug("ocr_engine loaded.")
 # logger.debug("trainsmit_db loaded.")
 
 
-def main(test_mode=False):    
+def main(test_mode=False):
+    logger.info(f"test mode : {test_mode}")
     print("To Exit, Press Ctrl+C")
+    
     while True:
         time.sleep(LOOP_PERIOD)
+        
+        file_name = get_time_str() + ".jpg"
         
         img = cam_manager.get_image()
         poly_dict = poly_detector(img)
         if poly_dict is None:
+            logger.info("no detect")
+            path = os.path.join(RECODE_PATH, "no_detect", file_name)
+            cv2.imwrite(path, img)
             cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.5, fy=0.5))
             if cv2.waitKey(1) & 0xff == ord('q'): break
             continue
@@ -56,8 +71,14 @@ def main(test_mode=False):
             pred_str = ocr_engine(crop_img)
             value_dict[label] = pred_str.strip()
         
+        logger.info(f"value_dict : {value_dict}")
+        
+        # recode image
+        img = draw_anno(img, poly_dict, value_dict)
+        path = os.path.join(RECODE_PATH, "detect", file_name)
+        cv2.imwrite(path, img)
+        
         if test_mode:
-            img = draw_anno(img, poly_dict, value_dict)
             cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.5, fy=0.5))
             if cv2.waitKey(1) & 0xff == ord('q'): break
         else:

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import datetime
 
 def draw_anno(img, poly_dict, value_dict):
     img = img.copy()
@@ -18,3 +19,8 @@ def draw_anno(img, poly_dict, value_dict):
         
     return img
     
+def get_time_str():
+    now = datetime.datetime.now()
+    s = f"{now.year:04d}{now.month:02d}{now.day:02d}{now.hour:02d}{now.minute:02d}{now.second:02d}"
+    s += f"_{now.microsecond:06d}"
+    return s
