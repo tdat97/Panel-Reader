@@ -53,9 +53,9 @@ def main(test_mode=False):
         
         file_name = get_time_str() + ".jpg"
         img = cam_manager.get_image()
-        poly_dict = poly_detector(img)
+        labels, polys, crop_imgs = poly_detector(img)
         
-        if poly_dict is None:
+        if labels is None:
             logger.info("no detect")
             path = os.path.join(RECODE_PATH, "no_detect", file_name)
             cv2.imwrite(path, img)
@@ -63,18 +63,30 @@ def main(test_mode=False):
             if cv2.waitKey(1) & 0xff == ord('q'): break
             continue
         
+        values = []
+        for label, crop_img in zip(labels, crop_imgs):
+            if label == TARGET_LABEL: 
+                values.append("")
+                continue  
+            pred_str = ocr_engine(crop_img).strip()
+            values.append(pred_str)
+        logger.info(f"values : {values}")
+            
+        
         # with poly_dict, Getting crop_img, pred_str
-        value_dict = {}
-        for label in ["target_tmp", "actual_tmp"]:
-            poly = poly_dict[label]
-            crop_img, _ = get_crop_img_and_M(img, poly)
-            crop_img = cv2.resize(crop_img, (0,0), fx=1.3, fy=1)
-            pred_str = ocr_engine(crop_img)
-            value_dict[label] = pred_str.strip()
-        logger.info(f"value_dict : {value_dict}")
+        # value_dict = {}
+        # for label in ["target_tmp", "actual_tmp"]:
+        #     poly = poly_dict[label]
+        #     crop_img, _ = get_crop_img_and_M(img, poly)
+        #     crop_img = cv2.resize(crop_img, (0,0), fx=1.3, fy=1)
+        #     pred_str = ocr_engine(crop_img)
+        #     value_dict[label] = pred_str.strip()
+        # logger.info(f"value_dict : {value_dict}")
+        
+        
         
         # recode image
-        img = draw_anno(img, poly_dict, value_dict)
+        img = draw_anno(img, labels, polys, values)
         path = os.path.join(RECODE_PATH, "detect", file_name)
         cv2.imwrite(path, img)
         
@@ -87,24 +99,7 @@ def main(test_mode=False):
             trainsmit_db(value_dict)
             
     cv2.destroyAllWindows()
-        
-
-# def test():
-#     path = "./temp/panel_rotate.png"
-#     img = cv2.imread(path)
-#     poly_dict = poly_detector(img)
     
-#     for label in ["target_tmp", "actual_tmp"]:
-#         poly = poly_dict[label]
-#         crop_img, _ = get_crop_img_and_M(img, poly)
-#         crop_img = cv2.resize(crop_img, (0,0), fx=1.3, fy=1)
-#         pred_str = ocr_engine(crop_img)
-#         print(pred_str)
-#         cv2.imshow(label, crop_img)
-#         cv2.waitKey(1)
-        
-#     cv2.waitKey(0)
-#     cv2.destroyAllWindows()
     
 def parse_option():
     parser = argparse.ArgumentParser()

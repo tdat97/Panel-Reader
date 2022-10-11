@@ -64,7 +64,7 @@ class SinglePolyDetector():
         
         # match
         kp, desc = self.detector.detectAndCompute(img_gray, None)
-        if len(kp) < 50: return None
+        if len(kp) < 50: return None, None, None
         matches = self.matcher.match(self.desc, desc)
         
         # get keypoints of matches
@@ -73,7 +73,13 @@ class SinglePolyDetector():
         
         # src_polys -> dst_polys
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RHO, 5.0)
-        if mask.sum() / mask.size < 0.15: return None
+        if mask.sum() / mask.size < 0.15: return None, None, None
         dst_polys = cv2.perspectiveTransform(self.src_polys, M)
         
-        return dict(zip(self.labels, dst_polys))
+        # get crop_imgs # 이래야 항상 크기가 일정함
+        h, w = img.shape[:2]
+        inv_M = cv2.getPerspectiveTransform(dst_polys, self.src_polys)
+        img_trans = cv2.warpPerspective(img, inv_M, (w, h))
+        crop_imgs = crop_obj_in_bg(img_trans, self.src_polys)
+        
+        return self.labels, dst_polys, crop_imgs
