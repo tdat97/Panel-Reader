@@ -70,7 +70,8 @@ def main(test_mode=False):
         for label, crop_img in zip(LABELS, crop_imgs):
             if label == LABELS[0]: 
                 values.append("")
-                continue  
+                continue
+            crop_img = cv2.resize(crop_img, (0,0), fx=1.3, fy=1)
             pred_str = ocr_engine(crop_img).strip()
             values.append(pred_str)
         logger.info(f"values : {values}")
