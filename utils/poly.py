@@ -9,7 +9,7 @@ def json2label(path): # json 경로
     labels = [shape["label"] for shape in data["shapes"]]
     points = [np.array(shape["points"]).astype(np.int32)
              for shape in data["shapes"]] # (n, 2?, 2)
-    return labels, points
+    return dict(zip(labels, points))
 
 def get_poly_box_wh(poly_box): # (4, 2)
     lt, rt, rb, lb = poly_box
@@ -37,20 +37,25 @@ def get_crop_img_and_M(img, poly):
     return crop_img, M
 
 class SinglePolyDetector():
-    def __init__(self, img_path, json_path, target_label_name='', n_features=5000):
+    def __init__(self, img_path, json_path, pick_labels=[], n_features=5000):
         img_gray = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
         assert img_gray is not None, "img_path is not correct."
         
-        self.labels, polys = json2label(json_path)
-        assert (target_label_name in self.labels) or (target_label_name==''), "Invalid label_name."
+        poly_dict = json2label(json_path)
         
-        if not target_label_name: target_idx = 0
-        else: target_idx = self.labels.index(target_label_name)
+        polys = [poly_dict[label] for label in pick_labels]
+            
+        # assert (target_label_name in self.labels) or (target_label_name==''), "Invalid label_name."
+        
+        # 0번 index를 target으로
+        # target_idx = self.labels.index(target_label_name)
+        # self.label[0], self.label[target_idx] = self.label[target_idx], self.label[0]
+        # polys[0], polys[target_idx] = polys[target_idx], polys[0]
         
         # keypoints
         self.detector = cv2.ORB_create(n_features)
         self.matcher = cv2.BFMatcher(cv2.NORM_HAMMING2, crossCheck=True)
-        crop_img_gray, M = get_crop_img_and_M(img_gray, polys[target_idx])
+        crop_img_gray, M = get_crop_img_and_M(img_gray, polys[0])
         self.kp, self.desc = self.detector.detectAndCompute(crop_img_gray, None)
         
         # transform polygons
@@ -64,7 +69,7 @@ class SinglePolyDetector():
         
         # match
         kp, desc = self.detector.detectAndCompute(img_gray, None)
-        if len(kp) < 50: return None
+        if len(kp) < 100: return None, None
         matches = self.matcher.match(self.desc, desc)
         
         # get keypoints of matches
@@ -73,7 +78,13 @@ class SinglePolyDetector():
         
         # src_polys -> dst_polys
         M, mask = cv2.findHomography(src_pts, dst_pts, cv2.RHO, 5.0)
-        if mask.sum() / mask.size < 0.15: return None
+        if mask.sum() / mask.size < 0.15: return None, None
         dst_polys = cv2.perspectiveTransform(self.src_polys, M)
         
-        return dict(zip(self.labels, dst_polys))
+        # get crop_imgs # 이래야 항상 크기가 일정함
+        h, w = img.shape[:2]
+        inv_M = cv2.getPerspectiveTransform(dst_polys[0], self.src_polys[0])
+        img_trans = cv2.warpPerspective(img, inv_M, (w, h))
+        crop_imgs = crop_obj_in_bg(img_trans, self.src_polys)
+        
+        return dst_polys, crop_imgs
