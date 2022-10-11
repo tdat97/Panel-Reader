@@ -19,9 +19,10 @@ import datetime
         
 #     return img
 
-def draw_anno(img, labels, polys, values):
+def draw_anno(img, labels, polys, values=None):
     img = img.copy()
     
+    if values is None: values = [''] * len(labels)
     polys = polys.astype(np.int32)
     cv2.polylines(img, polys, True, (255,0,255), 2)
     
