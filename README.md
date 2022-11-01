@@ -7,4 +7,20 @@
 
 ---
 
+## Install
 
+```
+git clone https://github.com/tdat97/Panel-Reader.git
+cd Panel-Reader
+pip install -r requirments.txt
+```
+
+---
+
+## Principle
+
+![image](https://user-images.githubusercontent.com/48349693/199141038-4a469bb0-f77a-4515-b4c2-a9bdb5baf824.png)
+![image](https://user-images.githubusercontent.com/48349693/199141066-8d1d831d-d058-44fc-9303-9bf35d3e677c.png)
+![image](https://user-images.githubusercontent.com/48349693/199141086-4183b242-5cb2-4c99-93b4-e4ec5c3a02eb.png)
+
+And Input crop_number_imgs in OCR_model.
