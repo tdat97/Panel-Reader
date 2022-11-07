@@ -1,6 +1,0 @@
-opencv-python
-numpy
-tensorflow
-
-jupyterlab
-labelme
