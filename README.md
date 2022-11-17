@@ -24,3 +24,10 @@ pip install -r requirments.txt
 ![image](https://user-images.githubusercontent.com/48349693/199141086-4183b242-5cb2-4c99-93b4-e4ec5c3a02eb.png)
 
 And Input crop_number_imgs in OCR_model.
+
+---
+
+### Example
+
+![MicrosoftTeams-image](https://user-images.githubusercontent.com/48349693/202341322-7aeec6e0-65be-4b3e-8511-2630126fcf34.png)
+
