@@ -1,6 +1,6 @@
 # from utils.camera import CameraManager
 from utils.poly import SinglePolyDetector, get_crop_img_and_M
-from utils.ocr import OcrEngine
+# from utils.ocr import OcrEngine
 # from utils.transmit import TransmitDB
 from utils.logger import logger, switch_logger_level
 from utils.tools import *
@@ -27,7 +27,7 @@ SOURCE_JSON_PATH = "./source/test.json"
 LABELS = ["panel", "target_tmp", "actual_tmp"]
 
 # OCR
-OCR_MODEL_PATH = "./source/OCR_aug3_300k.h5"
+OCR_MODEL_PATH = "./source/date_ocr.h5"
 
 # DB
 # DB_ADDR = ""

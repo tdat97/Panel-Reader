@@ -1,6 +1,6 @@
 # from utils.camera import CameraManager
 from utils.poly import SinglePolyDetector, get_crop_img_and_M
-from utils.ocr import OcrEngine
+# from utils.ocr import OcrEngine
 # from utils.transmit import TransmitDB
 from utils.logger import logger, switch_logger_level
 from utils.tools import *
