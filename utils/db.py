@@ -1,12 +1,15 @@
+from utils.logger import logger
+
 import pymysql
+import json
 
 DB_INFO_PATH = "./source/db_info.json"
 
 class DBManager():
     def __init__(self):
         info_dic = self.load_info()
-        self.connection = pymysql.connect(**info_dic, charset='utf8', autocommit=True, cursorclass=pymysql.cursors.Cursor)
-        self.cursor = self.connection.cursor()
+        # self.connection = pymysql.connect(**info_dic, charset='utf8', autocommit=True, cursorclass=pymysql.cursors.Cursor)
+        # self.cursor = self.connection.cursor()
         
     def load_info(self):
         with open(DB_INFO_PATH, 'r', encoding='utf-8') as f:
@@ -21,9 +24,9 @@ class DBManager():
         values_str = ", ".join(values)
         
         sql = f"INSERT INTO {table_name}({keys_str}) VALUES ({values_str});"
-        print("test sql")
-        print(sql)
+        logger.debug(sql)
         # self.cursor.execute(sql)
     
     def close(self):
-        self.connection.close()
+        #self.connection.close()
+        pass

@@ -1,6 +1,7 @@
 opencv-python
 numpy
 tensorflow
+pymysql
 
 jupyterlab
 labelme

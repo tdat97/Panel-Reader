@@ -27,7 +27,7 @@ if not os.path.isdir(path): os.mkdir(path)
 
 # Poly
 SOURCE_IMG_PATH = "./source/image.png"
-SOURCE_JSON_PATH = "./source/image.json"
+SOURCE_JSON_PATH = "./source/image_raw.json"
 LABELS = ["panel", "TEMP_SV1", "TEMP_PV1", "RUN_ST"]
 # LABELS = ["panel", "target_tmp", "actual_tmp", "run"]
 
@@ -67,8 +67,10 @@ def main(test_mode=False):
     print("To Exit, Press Ctrl+C")
     
     before_state = "1"
+    show_img = None
     while True:
         time.sleep(LOOP_PERIOD)
+        if show_img: cv2.imshow("show", show_img)
         if cv2.waitKey(1) & 0xff == ord('q'): break
         
         # file num manager
@@ -87,7 +89,7 @@ def main(test_mode=False):
             logger.info("no detect")
             path = os.path.join(RECODE_PATH, "no_detect", file_name)
             cv2.imwrite(path, img)
-            if test_mode: cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.3, fy=0.3))
+            if test_mode: show_img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
             continue
         
         # ocr pred values
@@ -103,8 +105,10 @@ def main(test_mode=False):
         pick = 3
         run_img_hsv = cv2.cvtColor(crop_imgs[pick], cv2.COLOR_BGR2HSV)
         color_mask = cv2.inRange(run_img_hsv, (0, 50, 50), (60, 255, 250)) # red ~ yellow
-        if NUM_PIXEL_BOUNDARY <= np.sum(color_mask//255): values[pick] = "ON"
+        pixel_cnt = np.sum(color_mask//255)
+        if NUM_PIXEL_BOUNDARY <= pixel_cnt: values[pick] = "ON"
         else: values[pick] = "OFF"
+        logger.debug(f"pixel_cnt : {pixel_cnt}")
         
         # recode image
         img = draw_anno(img, LABELS, polys, values)
@@ -113,8 +117,7 @@ def main(test_mode=False):
         logger.info(f"values : {values}\t file_name : {file_name}")
         
         # test show
-        if test_mode:
-            cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.3, fy=0.3))
+        if test_mode: show_img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
             # continue
         
         # fix values
