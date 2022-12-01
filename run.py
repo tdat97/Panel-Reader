@@ -52,8 +52,8 @@ status, img = cam.read()
 status, img = cam.read()
 logger.debug("cam opened.")
 
-# db_manager = DBManager()
-# logger.debug("db connected.")
+db_manager = DBManager()
+logger.debug("db connected.")
 
 poly_detector = SinglePolyDetector(SOURCE_IMG_PATH, SOURCE_JSON_PATH, pick_labels=LABELS)
 logger.debug("poly_detector loaded.")
@@ -115,7 +115,7 @@ def main(test_mode=False):
         # test show
         if test_mode:
             cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.3, fy=0.3))
-            continue
+            # continue
         
         # fix values
         pick = [1,2]
@@ -124,11 +124,6 @@ def main(test_mode=False):
             values[i] = int(values[i]) if values[i] else 0
         pick = 3
         values[pick] = "1" if values[pick] == "ON" else "0"
-            
-        # value_dict = {}
-        # for label, value in zip(LABELS[1:], values[1:]):
-        #     if value.isdigit(): value_dict[label] = value
-        #     else: value_dict[label] = ''
         
         # transfer DB
         if before_state == "0" and values[3] == "0": continue
@@ -141,7 +136,7 @@ def main(test_mode=False):
             
     cam.release()
     cv2.destroyAllWindows()
-    # db_manager.close()
+    db_manager.close()
     
     
 def parse_option():

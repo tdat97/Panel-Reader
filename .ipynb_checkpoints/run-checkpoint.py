@@ -10,9 +10,10 @@ import argparse
 import os
 import cv2
 import numpy as np
+import re
 
 # loop period (sec)
-LOOP_PERIOD = 60
+LOOP_PERIOD = 10
 
 # Recode
 RECODE_PATH = "./recode"
@@ -38,7 +39,7 @@ NUM_PIXEL_BOUNDARY = 700
 
 # DB
 TABLE_NAME = "tb_get_temp_f1p3"
-TABLE_COLUMNS = ["TEMP_SV1", "TEMP_PV1", "RUN_ST"] # 설정값, 현재값
+TABLE_COLUMNS = ["TEMP_SV1", "TEMP_PV1", "RUN_ST"] # 설정값, 현재값, 가동
 
 # Init
 cam = cv2.VideoCapture(0)
@@ -51,8 +52,8 @@ status, img = cam.read()
 status, img = cam.read()
 logger.debug("cam opened.")
 
-# db_manager = DBManager()
-# logger.debug("db connected.")
+db_manager = DBManager()
+logger.debug("db connected.")
 
 poly_detector = SinglePolyDetector(SOURCE_IMG_PATH, SOURCE_JSON_PATH, pick_labels=LABELS)
 logger.debug("poly_detector loaded.")
@@ -65,6 +66,7 @@ def main(test_mode=False):
     logger.info(f"test mode : {test_mode}")
     print("To Exit, Press Ctrl+C")
     
+    before_state = "1"
     while True:
         time.sleep(LOOP_PERIOD)
         if cv2.waitKey(1) & 0xff == ord('q'): break
@@ -113,21 +115,28 @@ def main(test_mode=False):
         # test show
         if test_mode:
             cv2.imshow("test_show", cv2.resize(img, (0,0), fx=0.3, fy=0.3))
-            continue
+            # continue
         
-        # transmit
+        # fix values
+        pick = [1,2]
+        for i in pick:
+            values[i] = re.sub(r'[^0-9]', '', values[i])
+            values[i] = int(values[i]) if values[i] else 0
+        pick = 3
+        values[pick] = "1" if values[pick] == "ON" else "0"
+        
+        # transfer DB
+        if before_state == "0" and values[3] == "0": continue
         value_dict = {}
-        for label, value in zip(LABELS[1:], values[1:]):
-            if value.isdigit(): value_dict[label] = value
-            else: value_dict[label] = ''
-
-        temp_dict = {}
-        temp_dict[TABLE_COLUMNS[0]] = 9999999999999999 # 설정값
-        temp_dict[TABLE_COLUMNS[1]] = 9999999999999999 # 현재값
-        db_manager.upload_data(TABLE_NAME, )
+        value_dict[TABLE_COLUMNS[0]] = values[1] # 설정값
+        value_dict[TABLE_COLUMNS[1]] = values[2] # 현재값
+        value_dict[TABLE_COLUMNS[2]] = values[3] # 현재값
+        db_manager.upload_data(TABLE_NAME, **value_dict)
+        before_state = values[3]
             
     cam.release()
     cv2.destroyAllWindows()
+    db_manager.close()
     
     
 def parse_option():
