@@ -45,6 +45,6 @@ class OcrEngine():
     
     def __call__(self, date_img):
         date_img = self._encode_single_img(date_img)
-        pred_str = self.inference_model.predict(date_img[None], verbose=1)[0]
+        pred_str = self.inference_model.predict(date_img[None], verbose=0)[0]
         pred_str = pred_str.decode('utf-8').strip('[UNK]')
         return pred_str

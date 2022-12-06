@@ -12,8 +12,8 @@ import cv2
 import numpy as np
 import re
 
-# loop period (sec)
-LOOP_PERIOD = 10
+# loop period (milli second)
+LOOP_PERIOD = 10000
 
 # Recode
 RECODE_PATH = "./recode"
@@ -35,7 +35,7 @@ LABELS = ["panel", "TEMP_SV1", "TEMP_PV1", "RUN_ST"]
 OCR_MODEL_PATH = "./source/date_ocr.h5"
 
 # Color
-NUM_PIXEL_BOUNDARY = 700
+NUM_PIXEL_BOUNDARY = 500
 
 # DB
 TABLE_NAME = "tb_get_temp_f1p3"
@@ -45,7 +45,7 @@ TABLE_COLUMNS = ["TEMP_SV1", "TEMP_PV1", "RUN_ST"] # 설정값, 현재값, 가�
 cam = cv2.VideoCapture(0)
 cam.set(cv2.CAP_PROP_FRAME_WIDTH, 2592)
 cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 1944)
-if not cam.isOpened(): print("Could not open webcam"); exit()
+if not cam.isOpened(): logger.debug("Could not open webcam"); exit()
 # cam warm up
 status, img = cam.read()
 status, img = cam.read()
@@ -62,16 +62,15 @@ ocr_engine = OcrEngine(OCR_MODEL_PATH)
 logger.debug("ocr_engine loaded.")
 
 
-def main(test_mode=False):
-    logger.info(f"test mode : {test_mode}")
-    print("To Exit, Press Ctrl+C")
+def main():
+    print("To Exit, Press 'Ctrl+C' OR 'Q'")
     
     before_state = "1"
     show_img = None
     while True:
-        time.sleep(LOOP_PERIOD)
+        # time.sleep(0.1)
         if show_img: cv2.imshow("show", show_img)
-        if cv2.waitKey(1) & 0xff == ord('q'): break
+        if cv2.waitKey(LOOP_PERIOD) & 0xff == ord('q'): break
         
         # file num manager
         manage_file_num(os.path.join(RECODE_PATH, "raw"))
@@ -89,7 +88,7 @@ def main(test_mode=False):
             logger.info("no detect")
             path = os.path.join(RECODE_PATH, "no_detect", file_name)
             cv2.imwrite(path, img)
-            if test_mode: show_img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
+            show_img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
             continue
         
         # ocr pred values
@@ -114,11 +113,8 @@ def main(test_mode=False):
         img = draw_anno(img, LABELS, polys, values)
         path = os.path.join(RECODE_PATH, "detect", file_name)
         cv2.imwrite(path, img)
-        logger.info(f"values : {values}\t file_name : {file_name}")
-        
-        # test show
-        if test_mode: show_img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
-            # continue
+        show_img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
+        logger.debug(f"values : {values}\t file_name : {file_name}")
         
         # fix values
         pick = [1,2]
@@ -133,7 +129,7 @@ def main(test_mode=False):
         value_dict = {}
         value_dict[TABLE_COLUMNS[0]] = values[1] # 설정값
         value_dict[TABLE_COLUMNS[1]] = values[2] # 현재값
-        value_dict[TABLE_COLUMNS[2]] = values[3] # 현재값
+        value_dict[TABLE_COLUMNS[2]] = values[3] # on/off
         db_manager.upload_data(TABLE_NAME, **value_dict)
         before_state = values[3]
             
