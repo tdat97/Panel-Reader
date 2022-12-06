@@ -28,4 +28,5 @@ And Input crop_number_imgs in OCR_model.
 ### Example
 
 ![MicrosoftTeams-image](https://user-images.githubusercontent.com/48349693/202341322-7aeec6e0-65be-4b3e-8511-2630126fcf34.png)
+![20221201092020_414599](https://user-images.githubusercontent.com/48349693/205863211-28b1010d-be22-4e82-9a66-6d0b2bb293b6.jpg)
 
