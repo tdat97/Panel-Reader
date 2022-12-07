@@ -35,7 +35,7 @@ LABELS = ["panel", "TEMP_SV1", "TEMP_PV1", "RUN_ST"]
 OCR_MODEL_PATH = "./source/date_ocr.h5"
 
 # Color
-NUM_PIXEL_BOUNDARY = 500
+NUM_PIXEL_BOUNDARY = 400
 
 # DB
 TABLE_NAME = "tb_get_temp_f1p3"
@@ -69,7 +69,7 @@ def main():
     show_img = None
     while True:
         # time.sleep(0.1)
-        if show_img: cv2.imshow("show", show_img)
+        if show_img is not None: cv2.imshow("show", show_img)
         if cv2.waitKey(LOOP_PERIOD) & 0xff == ord('q'): break
         
         # file num manager
@@ -82,14 +82,17 @@ def main():
         status, img = cam.read()
         if not status: logger.warning(f"status : {status}"); continue
         polys, crop_imgs = poly_detector(img) # (panel, target_tmp, actual_tmp, run)
+        path = os.path.join(RECODE_PATH, "raw", file_name)
+        cv2.imwrite(path, img)
         
         # no detect
         if polys is None:
-            logger.info("no detect")
+            logger.info("No Detected.")
             path = os.path.join(RECODE_PATH, "no_detect", file_name)
             cv2.imwrite(path, img)
             show_img = cv2.resize(img, (0,0), fx=0.3, fy=0.3)
             continue
+        logger.info("Detected.")
         
         # ocr pred values
         values = [None] * len(LABELS)
@@ -149,5 +152,4 @@ if __name__ == "__main__":
     opt = parse_option()
     log_level = opt.__dict__["loglevel"]
     switch_logger_level(log_level)
-    
     main()
