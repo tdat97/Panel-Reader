@@ -13,7 +13,7 @@ import numpy as np
 import re
 
 # loop period (milli second)
-LOOP_PERIOD = 10000
+LOOP_PERIOD = 30000
 
 # Recode
 RECODE_PATH = "./recode"
@@ -125,7 +125,7 @@ def main():
         values[pick] = "1" if values[pick] == "ON" else "0"
         
         # transfer DB
-        if before_state == "0" and values[3] == "0": continue
+        if before_state == values[3] == "0": continue
         value_dict = {}
         value_dict[TABLE_COLUMNS[0]] = values[1] # 설정값
         value_dict[TABLE_COLUMNS[1]] = values[2] # 현재값
@@ -140,7 +140,6 @@ def main():
     
 def parse_option():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test', action='store_true', help='test mode')
     parser.add_argument("--loglevel", type=str, default="DEBUG", 
                         help='["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]')
     return parser.parse_args()
@@ -151,4 +150,4 @@ if __name__ == "__main__":
     log_level = opt.__dict__["loglevel"]
     switch_logger_level(log_level)
     
-    main(opt.__dict__["test"])
+    main()

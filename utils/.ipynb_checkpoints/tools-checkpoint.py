@@ -30,7 +30,7 @@ def get_time_str():
 def manage_file_num(dir_path, max_size=1000, num_remove=100):
     path = os.path.join(dir_path, "*.jpg")
     img_paths = sorted(glob(path))
-    if len(img_paths) <= max_size: return
+    if len(img_paths) < max_size: return
 
     for path in img_paths[:num_remove]:
         os.remove(path)
