@@ -1,7 +1,9 @@
 import tensorflow as tf
 
-SORTED_CHARS = [' ', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-MAX_LENGTH = 23
+SORTED_CHARS = sorted([' ', '-', '.', '/', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
+IMG_HEIGHT = 64
+MAX_WIDTH = 1024
+MAX_LENGTH = 25
 char_to_num = tf.keras.layers.StringLookup(vocabulary=SORTED_CHARS, mask_token=None)
 num_to_char = tf.keras.layers.StringLookup(vocabulary=char_to_num.get_vocabulary(), mask_token=None, invert=True)
 
@@ -18,7 +20,7 @@ class CTCDecodeLayer(tf.keras.layers.Layer):
         return results
 
 class OcrEngine():
-    def __init__(self, model_path, input_shape=(512, 64, 3)):
+    def __init__(self, model_path, input_shape=(MAX_WIDTH, IMG_HEIGHT, 3)):
         self.IMG_WIDTH, self.IMG_HEIGHT, self.IMG_CH = input_shape
         model = tf.keras.models.load_model(model_path, compile=False)
         image = tf.keras.layers.Input(shape=input_shape, name='Image')
